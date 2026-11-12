@@ -78,7 +78,7 @@ Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bư�
 - Đặt cứng tên volume `onhand-mausbot_data`.
 - Giới hạn `omb` ở 6 GB RAM và 4 CPU.
 - Thêm backup volume hằng ngày.
-- Kiểm tra trước API `domain.toggleEnable`.
+- Domain Rakazo được xóa thẳng (`domain.delete`), không cần API tắt domain.
 - Phase 6 cần phiên Xorg, vì Wayland chặn điều khiển máy local.
 
 Đã xác nhận đúng:
