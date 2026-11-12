@@ -49,12 +49,41 @@ Các nguyên nhân có thể khiến bot Rakazo cứng nhắc, đọc từ `onha
 - Ngay sau tin đầu tiên, bot Rakazo **tự viết lại hướng dẫn của chính nó** (`update_bot`) và tự gắn skill `giao-thuc-doi-bot` dùng chung trong space. Từ đó lượt nào nó cũng đọc lại skill này, nên chậm hơn.
 - Prompt của các routine production có hàng chục ràng buộc. Cảm giác "tù" nhiều khả năng đến từ cấu hình đội bot, không phải do model hay pi.
 
+## Bài thử 12/11: trí nhớ hội thoại dài, onhandbot trong space sạch
+
+**Cấu hình:**
+- Cả hai bên dùng GPT 6.1 Sol mức medium.
+- Bot onhandbot nằm trong space mới `TEST-sach`, không chia sẻ skill nào (`skills/list` trả 0).
+
+**Kịch bản** (29 lượt, 58 tin nhắn):
+- Lượt chào.
+- Lượt 1: bot chạy lệnh python in `MA 320939 do`, chỉ được trả lời "xong".
+- 26 lượt đệm: phép nhân xen lệnh `echo`, cứ 4 lượt có một lệnh.
+- Lượt cuối: hỏi lại mã và màu, không được chạy lại lệnh.
+
+| | Plus | onhandbot, space sạch |
+|---|---|---|
+| 26 lượt đệm | Đúng hết | Đúng hết |
+| Lượt cuối | **"Mã 320939, màu đỏ"** | **"Không nhớ."** Có gọi Search history nhưng không tìm ra |
+| Tổng thời gian | 186 giây, 5–10 giây mỗi lượt | 134 giây, 3–9 giây mỗi lượt |
+
+Bản chạy trước của Plus dùng nhầm model mặc định (Claude) cũng nhớ đúng. Kết quả đó chỉ để tham khảo.
+
+**Kết luận:**
+- Onhandbot quên thật một chi tiết chỉ nằm trong kết quả công cụ, sau khoảng 50 tin hoặc sau vài lần gọi công cụ.
+- Điều này khớp với code: chỉ giữ 3 kết quả công cụ gần nhất và cửa sổ 50 tin. Bài này chưa tách được nguyên nhân nào gây ra.
+- Search history không tìm được trong kết quả công cụ.
+- Mặt tốt: bot nói thật là "không nhớ", không bịa.
+- Trong space sạch, onhandbot nhanh hơn Plus (3 giây so với 5 giây cho lượt không gọi công cụ). Hôm qua trong space có skill dùng chung, bot chậm gấp đôi. Vậy skill `giao-thuc-doi-bot` dùng chung là nguyên nhân chậm, không phải pi.
+- Trong việc thật, bot sẽ phải đọc lại hoặc làm lại những gì đã thấy ở các lượt trước, ví dụ số liệu đã tra trên Shopee hay Upwork. Nếu không đọc lại, nó sẽ báo "chưa xác minh". Điều này khớp với cảm giác "tù".
+
 ## Tối nay thử tiếp
 
-1. Hội thoại dài hơn 50 tin: hỏi lại chi tiết chỉ nằm trong kết quả công cụ ở lượt đầu.
+1. ~~Hội thoại dài hơn 50 tin~~: đã làm 12/11, onhandbot quên.
 2. Việc thao tác trình duyệt nhiều bước, để xem số công cụ có làm bot chọn sai không.
-3. Đặt bot Rakazo vào một space sạch không có skill dùng chung, rồi so lại tốc độ.
+3. ~~Space sạch~~: đã làm 12/11, nhanh hơn rõ rệt.
 4. Thử thêm mức suy nghĩ `high` cho cả hai bên.
+5. Tách nguyên nhân quên: chạy dưới 50 tin nhưng có hơn 3 lần gọi công cụ, và ngược lại.
 
 ## Cách chạy lại
 
@@ -84,7 +113,7 @@ node --experimental-strip-types scripts/control-omb.ts run --bot <ID> --task <TA
 - `threads/get` với `{botId}`, rồi xem `run.status` và `messages[].blocks`.
 - `bots/remove` với `{botId, deleteMemories: true}`. Phải hỏi anh trước khi xóa.
 
-Bot thử bên production đã xóa sau buổi thử.
+Bot thử bên production đã xóa sau mỗi buổi thử (11/11: bot thử; 12/11: bot `TEST-dai` và space `TEST-sach`).
 
 **Sinh lại dữ liệu thử** (`random.seed(7)`):
 
