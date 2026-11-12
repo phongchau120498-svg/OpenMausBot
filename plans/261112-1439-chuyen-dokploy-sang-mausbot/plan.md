@@ -42,6 +42,41 @@ Rakazo chỉ là bản thử, chưa chạy thật. Anh đã cho phép gỡ hẳn
 - Kênh `stable` của upstream chưa có. Dùng release mới nhất là `v0.1.153`, trùng version của fork.
 - Sandbox AppArmor của bot chưa có trong version này (repo chưa có `deploy/box/`). Vì vậy **không cần sửa máy chủ dùng chung**.
 
+## Hướng dẫn cho agent thực thi (đọc trước khi làm bất cứ gì)
+
+Plan này viết cho một agent khác thực thi (Sonnet 5.5, mức high). Mọi giá trị cần dùng (id, nội dung file, tham số tool, kết quả mong đợi) đều đã ghi sẵn trong phase. **Không đoán thêm. Thiếu gì thì dừng và hỏi anh.**
+
+**Thứ tự đọc:**
+1. File này.
+2. `AGENTS.md` ở gốc repo, phần quy tắc viết comment.
+3. File phase đang làm. Chỉ đọc phase đó.
+
+**Luật cứng:**
+1. **Máy Dokploy dùng chung với khoảng 15 project khác.** Tool ghi (create, update, delete, deploy, stop, remove) chỉ được gọi lên:
+   - compose `mausbot` mới tạo;
+   - compose Rakazo `rkPYxiV0FMWyfpAGkV4zu` cùng 4 domain của nó;
+   - container và volume khớp mẫu tên ghi ở phase 5.
+
+   Đọc lại tên và id trước mỗi lần xóa.
+2. **Không tự đăng nhập, không nhập mật khẩu hay mã.** Đăng nhập CLI, link pair và các nút Allow đều do anh làm. Agent đưa lệnh, chờ anh, rồi kiểm tra kết quả.
+3. Không SSH được vào máy Dokploy (`onehand-vps` trong `~/.ssh/config` là **máy khác**). Lệnh chạy trong container thì nhờ anh chạy ở terminal Docker của Dokploy.
+4. Không commit secret, `.env`, file thử nghiệm hay `.claude/launch.json`. Lệnh commit dùng `git -c user.name=phongchau120498-svg -c user.email=phongchau120498@gmail.com commit …`. Push lên `origin main` đã được anh cho phép.
+5. Không sửa file của upstream. Chỉ thêm file trong `deploy/dokploy/`.
+6. Làm từng phase theo thứ tự. Xong phase nào thì:
+   - chạy `cd "plans/261112-1439-chuyen-dokploy-sang-mausbot" && ck plan check <số phase>`;
+   - ghi bằng chứng vào mục **Nhật ký thực thi** ở cuối file này, gồm lệnh hoặc tool đã gọi và kết quả thật, ngắn gọn. Không ghi "PASS" suông.
+7. **Dừng và báo anh** khi:
+   - một phép thử an ninh trả `200` (phase 2 bước 4b, phase 5 bước 6b/6d);
+   - thiếu RAM hoặc đĩa;
+   - deploy lỗi 2 lần liên tiếp;
+   - cần quyết định nằm ngoài plan.
+
+   Không tự "sửa cho chạy" bằng cách bỏ kiểm tra.
+
+**Tool:**
+- Dokploy: `mcp__lowbit-dokploy__<tên>`. Tên trong plan viết dạng `compose-create`, ứng với tool `mcp__lowbit-dokploy__compose-create`. Tool chưa có thì nạp bằng ToolSearch `select:mcp__lowbit-dokploy__<tên>`.
+- Lệnh trên máy local: Bash.
+
 ## Phases
 
 | Phase | Name | Status |
@@ -67,7 +102,7 @@ Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bư�
 
 ## Cách quay lại (rollback)
 
-- Trước khi gỡ Rakazo (phase 5 bước 9): xóa domain MausBot, tạo lại 4 domain Rakazo theo bảng ở trên, rồi `compose.start` Rakazo.
+- Trước khi gỡ Rakazo (phase 5 bước 9): làm theo mục "Quay lại" trong phase 5.
 - Sau khi gỡ: không quay về Rakazo được nữa, như anh đã cho phép. Nếu MausBot lỗi thì sửa MausBot.
 
 ## Đã phản biện (red team 12/11)
@@ -77,7 +112,7 @@ Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bư�
 - Bỏ lệnh `doctor` vì không tồn tại.
 - Đặt cứng tên volume `onhand-mausbot_data`.
 - Giới hạn `omb` ở 6 GB RAM và 4 CPU.
-- Thêm backup volume hằng ngày.
+- Thêm backup volume hằng ngày. Hiện Dokploy chưa có destination nào, nên việc này chờ anh tạo.
 - Domain Rakazo được xóa thẳng (`domain.delete`), không cần API tắt domain.
 - Phase 6 cần phiên Xorg, vì Wayland chặn điều khiển máy local.
 
@@ -90,3 +125,11 @@ Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bư�
 
 1. Có làm subdomain thử `maus.onehand.space` (anh thêm bản ghi A → 51.79.254.165) để thử MausBot qua web trước khi chuyển hẳn không? Mặc định là **không**: chuyển thẳng domain vì Rakazo chỉ là bản thử. Trước đó MausBot chỉ được kiểm tra bên trong container.
 2. Máy local có chuyển sang phiên Xorg không? Chỉ khi đó bot mới dùng được trình duyệt local. Ở lại Wayland thì bot chỉ dùng được thư mục và terminal.
+3. Backup lưu ở đâu? Dokploy chưa có destination (S3 hoặc R2). Anh tạo một destination thì phase 5 bước 10 mới bật backup được.
+
+## Nhật ký thực thi
+
+Agent thực thi ghi vào đây sau mỗi phase: ngày giờ, phase, tool hoặc lệnh đã chạy, kết quả thật, commit nếu có.
+
+- `MAUS_ID`: (ghi ở phase 3)
+- `MAUS_APP`: (ghi ở phase 3)

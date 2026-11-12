@@ -9,44 +9,62 @@ dependencies: [3]
 # Phase 4: Đăng nhập CLI trên VPS
 
 ## Overview
-Đăng nhập Codex (chính), Claude Code (dự phòng) và Grok (tùy chọn) **bên trong container `omb`**. Thông tin đăng nhập nằm trong volume `/data` nên còn nguyên qua restart.
+Anh đăng nhập Codex (engine chính), Claude Code (dự phòng) và Grok (tùy chọn) bên trong container `omb`. Agent thực thi **chỉ hướng dẫn và kiểm tra kết quả**.
 
-## Requirements
-- **Anh tự đăng nhập.** Claude chỉ hướng dẫn và kiểm tra kết quả, không nhập mật khẩu hay mã.
-- Chạy với user `maus` của image, không chạy bằng root. Nếu chạy bằng root, thông tin đăng nhập sẽ nằm ở home khác (`docs/deploy-vps.md`).
-- Không chép file đăng nhập ra ngoài container, không đưa vào git hay vào log.
+## Quy tắc
+- **Agent không được tự đăng nhập.** Agent không nhập mật khẩu, không dán mã thiết bị, không mở link đăng nhập thay anh. Agent chỉ đưa lệnh cho anh và đọc kết quả anh gửi lại.
+- Agent không có SSH và không có `docker exec` tới máy Dokploy. Mọi lệnh trong container do anh chạy ở **Dokploy → project onhand-bot → mausbot → Docker → `<MAUS_APP>-omb-1` → Terminal**.
+- Không chép file đăng nhập ra ngoài, không đưa nội dung đó vào chat hay log. Anh có thể gửi lại kết quả lệnh, trừ phần mã hoặc link đăng nhập.
+- HOME của user `maus` là `/data`, nằm trên volume (`Dockerfile:88`). Đăng nhập vì vậy còn nguyên qua restart và redeploy.
 
-## Implementation Steps
-Mở Dokploy → project `onhand-bot` → `mausbot` → **Docker** → container `…-omb-1` → **Terminal** (shell `bash`, user mặc định của image).
+## Các bước (agent gửi anh lần lượt, từng bước một, chờ anh trả kết quả)
 
-1. Kiểm tra môi trường:
-   ```bash
-   whoami && echo "$HOME" && codex --version && claude --version && grok --version
-   ```
-   Kết quả phải là user `maus` và home nằm dưới `/data`. Nếu home không nằm dưới `/data`, dừng lại. Khi đó đăng nhập sẽ mất lúc redeploy, cần sửa compose.
-2. **Codex** (agent chính, dùng gói ChatGPT):
-   ```bash
-   codex login --device-auth
-   ```
-   Anh mở link được in ra trên máy mình, nhập mã, rồi chọn tài khoản ChatGPT. Kiểm tra bằng `codex login status`.
-3. **Claude Code** (dự phòng, dùng gói Claude):
-   ```bash
-   claude
-   ```
-   Trong giao diện, gõ `/login`, chọn gói Claude, mở link, dán mã, rồi `/exit`. Kiểm tra bằng `claude -p "ok"`. Lệnh này trả về một câu.
-4. **Grok** (tùy chọn, thay Grok bot cũ): đăng nhập bằng mã thiết bị từ trong app (Settings → Engines). Hoặc chạy `grok` trong terminal và làm theo hướng dẫn.
-5. Kiểm tra từ phía server:
-   ```bash
-   openmausbot status
-   ```
-   CLI không có lệnh `doctor`. Sau phase 5, xem thêm trong UI ở Settings → Engines.
-6. Restart container `omb` trong Dokploy, rồi chạy lại `codex login status`. Vẫn phải báo đã đăng nhập.
+### 1. Mở terminal và kiểm tra
+```bash
+whoami; echo $HOME; codex --version; claude --version; grok --version
+```
+Phải thấy `maus` và `/data`. Nếu `whoami` ra `root`, chạy `su -s /bin/bash maus` rồi chạy lại lệnh trên. Nếu HOME không phải `/data`, **dừng**: đăng nhập sẽ mất khi deploy lại. Báo anh.
+
+### 2. Codex (engine chính, gói ChatGPT)
+```bash
+codex login --device-auth
+```
+Lệnh in ra một link và một mã. Anh mở link trên máy mình, nhập mã, chọn tài khoản ChatGPT. Sau đó kiểm tra:
+```bash
+codex login status
+```
+Phải thấy dòng báo đã đăng nhập bằng ChatGPT.
+
+### 3. Claude Code (dự phòng, gói Claude)
+```bash
+claude
+```
+Trong giao diện, gõ `/login` và chọn gói Claude. Mở link, dán mã trả về, rồi gõ `/exit`. Kiểm tra:
+```bash
+claude -p "Trả lời đúng một chữ: ok"
+```
+
+### 4. Grok (tùy chọn, anh quyết)
+Có 2 cách:
+- Chạy `grok` trong terminal và làm theo hướng dẫn.
+- Hoặc để sau phase 5, đăng nhập bằng mã thiết bị trong app ở Settings → Engines.
+
+### 5. Kiểm tra từ server
+```bash
+openmausbot status
+```
+CLI không có lệnh `doctor`. Ghi lại kết quả. Sau phase 5, xem thêm ở Settings → Engines trên giao diện.
+
+### 6. Kiểm tra đăng nhập còn sau restart
+1. Agent gọi `docker-restartContainer {containerId: <id của omb>}`. Đây là tool ghi, nhưng chỉ đụng container của `mausbot`.
+2. Chờ container healthy trở lại.
+3. Anh mở terminal mới và chạy `codex login status`. Kết quả vẫn phải báo đã đăng nhập.
 
 ## Success Criteria
-- [ ] `codex login status` báo đã đăng nhập, kể cả sau restart.
-- [ ] `claude -p "ok"` trả lời được. Grok tùy anh.
-- [ ] Không có file đăng nhập nào nằm ngoài volume `/data`.
+- [ ] `codex login status` báo đã đăng nhập, cả trước và sau khi restart.
+- [ ] `claude -p` trả lời được.
+- [ ] Grok: đã đăng nhập, hoặc anh chọn để sau. Ghi rõ là trường hợp nào.
 
-## Risk Assessment
-- Image chạy bằng user `maus` với HOME=/data (`Dockerfile:15,159`). Nếu terminal vẫn mở bằng root, chạy `su -s /bin/bash maus`.
-- Dùng một tài khoản ChatGPT cho nhiều nơi cùng lúc có thể chạm giới hạn lượt. Theo dõi trong tuần đầu.
+## Khi gặp lỗi
+- `codex login --device-auth` báo không có cờ này: chạy `codex login --help`, rồi báo anh cách đăng nhập không cần trình duyệt mà bản này hỗ trợ.
+- Terminal Dokploy không mở được: anh dùng nút "Open terminal" trong trang Docker của Dokploy. Không có cách nào khác vì không có SSH.
