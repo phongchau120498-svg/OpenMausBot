@@ -227,4 +227,5 @@ Agent thực thi ghi vào đây sau mỗi phase: ngày giờ, phase, tool hoặc
 - Anh tự đổi tên MausBot thành "Chiêu Giao" và xóa bot "Chiêu Giao · ASSIATANT" cũ.
 - Đã kiểm tra lúc 17:30: không bot nào là Chief (MausBot/"Chiêu Giao": chiefOfStaff=false, managedSections=[], claude/claude-sonnet-5, soul 409 ký tự). Quy ước "Máy local và server" đã mất cùng bot cũ. Phòng ban "Chiêu Giao · ASSIATANT" giờ trống.
 - Máy tính của bot: không có khái niệm máy tính chung cho team. Mỗi bot có sẵn trình duyệt tích hợp trên VPS. Desktop đầy đủ có thể dùng: máy ở nhà (đã chia sẻ), desktop VPS tự host (đề xuất dùng `onehand-vps`, chưa làm), hoặc Boat (trả phí).
+- Đặt lại Chief (17:33): `PATCH` "Chiêu Giao" (MausBot `0ebe9b31`) `{chiefOfStaff:true, managedSections:[5 phòng ban], acknowledgePeerScope:true}`. Thêm lại mục "Máy local và server" vào soul: 409 → 984 ký tự, phần cũ giữ nguyên. Model giữ `claude/claude-sonnet-5`. Khi được hỏi, Chiêu Giao liệt kê đúng 5 bot và phòng ban.
 
