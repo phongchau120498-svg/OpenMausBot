@@ -77,6 +77,8 @@ Plan này viết cho một agent khác thực thi (Sonnet 5.5, mức high). Mọ
 - Dokploy: `mcp__lowbit-dokploy__<tên>`. Tên trong plan viết dạng `compose-create`, ứng với tool `mcp__lowbit-dokploy__compose-create`. Tool chưa có thì nạp bằng ToolSearch `select:mcp__lowbit-dokploy__<tên>`.
 - Lệnh trên máy local: Bash.
 
+**Nhiều tài khoản Codex:** anh có 5 tài khoản Plus, mỗi tài khoản bị giới hạn 5 giờ. Codex CLI chỉ giữ một đăng nhập mỗi `CODEX_HOME`, nên mỗi tài khoản có một `CODEX_HOME` và một instance riêng (phase 4 bước 7). Plus tự chuyển sang tài khoản dự phòng khi hết lượt, mà không cần đăng nhập lại. Cơ chế tự chuyển đã bật sẵn.
+
 ## Phases
 
 | Phase | Name | Status |
@@ -95,6 +97,7 @@ Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bư�
 - [ ] `https://bot.onehand.space/api/health` trả về JSON chứa `openmausbot`.
 - [ ] Anh ghép được trình duyệt và app desktop. Trang chưa đăng nhập chỉ hiện trang pair.
 - [ ] Agent chính chạy `codex` / `gpt-6.1-sol` / `medium`, trả lời một lượt thử. Chạy được thêm một lượt ở mức `high`.
+- [ ] 5 tài khoản Codex nằm trong 5 instance, email khác nhau, và danh sách dự phòng của agent chính đã đặt.
 - [ ] Đăng nhập CLI nằm trong volume `/data`: restart hay redeploy container không mất đăng nhập.
 - [ ] Rakazo đã gỡ hết: compose, volume, các container `rakazo-bot-team-*` và 4 domain. Project `onhand-bot` vẫn còn và chứa `mausbot`.
 - [ ] Không project Dokploy nào khác bị đổi: so `project.all` trước và sau.
