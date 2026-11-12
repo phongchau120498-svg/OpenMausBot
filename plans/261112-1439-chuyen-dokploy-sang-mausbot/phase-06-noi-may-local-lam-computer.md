@@ -1,9 +1,10 @@
 ---
 phase: 6
-title: "Nối máy local làm computer"
-status: pending
+title: Nối máy local làm computer
+status: completed
 priority: P2
-dependencies: [5]
+dependencies:
+  - 5
 ---
 
 # Phase 6: Nối máy local làm computer
