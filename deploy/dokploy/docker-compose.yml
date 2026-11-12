@@ -1,0 +1,57 @@
+# OpenMausBot on a Dokploy host. Dokploy's Traefik owns 80/443 and routes the domain to caddy:80,
+# so nothing here publishes a port. Dokploy writes .env next to this file from the compose's
+# Environment tab: DOMAIN, OMB_BASE_IMAGE and OMB_DATA_VOLUME are required.
+services:
+  omb:
+    init: true
+    shm_size: 512m
+    build:
+      context: ../local
+      args:
+        BASE_IMAGE: ${OMB_BASE_IMAGE:?set OMB_BASE_IMAGE to a released image tag}
+    image: onhand-mausbot-local:current
+    restart: unless-stopped
+    mem_limit: 6g
+    cpus: 4
+    volumes:
+      - data:/data
+      - edge:/run/openmausbot
+    environment:
+      OMB_PORT: "8799"
+      OMB_WEBHOOK_PORT: "8800"
+      OMB_TUNNEL_SOCKET: /run/openmausbot/http.sock
+      OMB_WEBHOOK_SOCKET: /run/openmausbot/hooks.sock
+      OMB_SERVER_NAME: ${DOMAIN:?set DOMAIN}
+      OMB_PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+      OMB_WEBHOOK_PUBLIC_URL: https://${DOMAIN:?set DOMAIN}
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8799/api/health', { signal: AbortSignal.timeout(4000) }).then(async r => { if (!r.ok || !(await r.text()).includes('openmausbot')) process.exit(1); }).catch(() => process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+  caddy:
+    image: caddy:2.10.2
+    restart: unless-stopped
+    depends_on:
+      omb:
+        condition: service_started
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - edge:/run/openmausbot
+      - caddy_data:/data
+      - caddy_config:/config
+volumes:
+  data:
+    name: ${OMB_DATA_VOLUME:?set OMB_DATA_VOLUME}
+  edge:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: mode=1777,size=1m
+  caddy_data:
+  caddy_config:

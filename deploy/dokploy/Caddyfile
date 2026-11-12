@@ -1,0 +1,32 @@
+# Dokploy's Traefik ends TLS and reaches this Caddy over dokploy-network; Caddy reaches the
+# server over the Unix sockets in the edge volume. The server reads the last X-Forwarded-For
+# hop, so Caddy writes exactly one: the client address Traefik reported.
+{
+	admin off
+	auto_https off
+	servers {
+		trusted_proxies static private_ranges
+		trusted_proxies_strict
+		client_ip_headers X-Forwarded-For
+	}
+}
+
+:80 {
+	encode zstd gzip
+
+	handle /hooks/* {
+		reverse_proxy unix//run/openmausbot/hooks.sock {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+
+	handle {
+		reverse_proxy unix//run/openmausbot/http.sock {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-For {client_ip}
+			header_up -Accept-Encoding
+			flush_interval -1
+		}
+	}
+}
