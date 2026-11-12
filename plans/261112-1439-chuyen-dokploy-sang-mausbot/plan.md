@@ -219,4 +219,5 @@ Agent thực thi ghi vào đây sau mỗi phase: ngày giờ, phase, tool hoặc
 - Bước 6: `PATCH soul` cho Chiêu Giao, thêm mục "Máy local và server" (việc nặng hoặc cần tài khoản đã đăng nhập thì làm ở máy local, việc lặp lại và routine thì làm ở server, máy local offline thì báo anh). soul 415 → 975 ký tự, phần cũ giữ nguyên, model không đổi.
 - Chưa làm: thử tắt "Share this computer" (bước 7c).
 - Đang Wayland: không điều khiển được màn hình local.
+- Chief of Staff (anh chọn phương án A): `PATCH` Chiêu Giao `{chiefOfStaff:true, managedSections:[Gia Huy - ECOM, Tiêu Băng - CONTENT, Minh Đăng - SEFT EVOLUTION, UX UI PROMAX, Như Phương - SALE], acknowledgePeerScope:true}` → 200. Lúc 16:33, khi được hỏi, Chiêu Giao liệt kê đúng 5 bot và phòng ban. Bot MausBot (Chief mặc định, Claude) giữ nguyên. Mức duyệt của Chief áp xuống việc nó giao bằng `coordinate_bots`.
 
