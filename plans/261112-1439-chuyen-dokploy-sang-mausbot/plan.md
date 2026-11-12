@@ -221,3 +221,10 @@ Agent thực thi ghi vào đây sau mỗi phase: ngày giờ, phase, tool hoặc
 - Đang Wayland: không điều khiển được màn hình local.
 - Chief of Staff (anh chọn phương án A): `PATCH` Chiêu Giao `{chiefOfStaff:true, managedSections:[Gia Huy - ECOM, Tiêu Băng - CONTENT, Minh Đăng - SEFT EVOLUTION, UX UI PROMAX, Như Phương - SALE], acknowledgePeerScope:true}` → 200. Lúc 16:33, khi được hỏi, Chiêu Giao liệt kê đúng 5 bot và phòng ban. Bot MausBot (Chief mặc định, Claude) giữ nguyên. Mức duyệt của Chief áp xuống việc nó giao bằng `coordinate_bots`.
 
+### Sau phase 6 (12/11 17:30)
+- Đăng nhập bằng email: `PUT /api/config signIn.admins = [email của anh]`; `emailSignIn` của server → true. Safari trên iPhone đã đăng nhập bằng email (phiên có email, quyền admin). App iOS gốc không đăng nhập được bằng email, nên dùng Safari "Thêm vào MH chính".
+- App desktop trên máy anh chưa đăng nhập lại bằng email: 3 phiên "Chrome on Linux" đều không có email. Vì vậy điện thoại chưa dùng được máy ở nhà, cho tới khi app desktop bấm "Ghép nối lại" và đăng nhập bằng cùng email.
+- Anh tự đổi tên MausBot thành "Chiêu Giao" và xóa bot "Chiêu Giao · ASSIATANT" cũ.
+- Đã kiểm tra lúc 17:30: không bot nào là Chief (MausBot/"Chiêu Giao": chiefOfStaff=false, managedSections=[], claude/claude-sonnet-5, soul 409 ký tự). Quy ước "Máy local và server" đã mất cùng bot cũ. Phòng ban "Chiêu Giao · ASSIATANT" giờ trống.
+- Máy tính của bot: không có khái niệm máy tính chung cho team. Mỗi bot có sẵn trình duyệt tích hợp trên VPS. Desktop đầy đủ có thể dùng: máy ở nhà (đã chia sẻ), desktop VPS tự host (đề xuất dùng `onehand-vps`, chưa làm), hoặc Boat (trả phí).
+
