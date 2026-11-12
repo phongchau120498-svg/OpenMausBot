@@ -216,6 +216,7 @@ Agent thực thi ghi vào đây sau mỗi phase: ngày giờ, phase, tool hoặc
 - Dữ liệu local cũ (6 bot) chuyển sang `~/.openmausbot.bak-261112` (không xóa), để app chỉ dùng bot của server. Trả lại bằng cách đổi tên ngược.
 - Lần thử đầu gửi từ trình duyệt của agent thất bại ("không có máy local trực tuyến"): `personKey` = email, hoặc id phiên khi không có email (`server/person-key.ts`). Máy được cho mượn gắn với phiên "May local" của app desktop.
 - Thử từ app desktop lúc 16:27: Chiêu Giao chạy `uname -a; hostname` trên máy local → `Linux thanh-phong-Z690-Steel-Legend 7.0.0-42-generic … x86_64`.
-- Chưa làm: thử tắt "Share this computer" (bước 7c); đặt quy ước việc nặng/nhẹ vào hướng dẫn bot (bước 6).
+- Bước 6: `PATCH soul` cho Chiêu Giao, thêm mục "Máy local và server" (việc nặng hoặc cần tài khoản đã đăng nhập thì làm ở máy local, việc lặp lại và routine thì làm ở server, máy local offline thì báo anh). soul 415 → 975 ký tự, phần cũ giữ nguyên, model không đổi.
+- Chưa làm: thử tắt "Share this computer" (bước 7c).
 - Đang Wayland: không điều khiển được màn hình local.
 
