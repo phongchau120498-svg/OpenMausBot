@@ -42,7 +42,7 @@ Tạm ngưng Rakazo, chuyển `bot.onehand.space` sang MausBot, ghép thiết b�
 11. So `project.all` với mốc ở phase 3. Chỉ được khác: compose mới, domain mới, và `autoDeploy`, trạng thái, domain của Rakazo.
 
 ## Rollback
-1. `domain.toggleEnable` tắt domain của `mausbot`, rồi `compose.stop mausbot`.
+1. Tắt domain của `mausbot` (`domain.toggleEnable`, hoặc xóa nếu không có API đó), rồi `compose.stop mausbot`.
 2. Bật lại 4 domain Rakazo, chạy `compose.start` Rakazo và đặt lại `autoDeploy: true`.
 3. Kiểm tra lại `bot.onehand.space/health` của Rakazo.
 

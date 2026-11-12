@@ -33,7 +33,7 @@ Tạo compose mới tên `mausbot` trong project `onhand-bot` trên Dokploy. Ch�
 6. Kiểm tra:
    - `docker.getContainersByAppNameMatch` cho thấy `omb` (healthy) và `caddy` đang chạy.
    - Log `omb` không có lỗi.
-   - Ghi lại tên volume `<appName>_data`.
+   - Xác nhận volume tên đúng `onhand-mausbot_data`.
 7. Kiểm tra trước API dùng ở phase 5:
    - Tìm `domain.toggleEnable` trong OpenAPI của Dokploy (`settings.getOpenApiDocument`, chỉ đọc).
    - Nếu không có: ghi lại đủ cấu hình 4 domain Rakazo (host, path, service, port, middleware). Phase 5 sẽ xóa rồi tạo lại khi cần rollback.
