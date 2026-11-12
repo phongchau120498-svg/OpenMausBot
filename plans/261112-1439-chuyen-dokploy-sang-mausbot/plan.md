@@ -1,14 +1,19 @@
 ---
-title: "Chuyển bot từ onhandbot sang MausBot trên Dokploy"
-description: "Chạy fork OpenMausBot này trên Dokploy tại bot.onehand.space thay Rakazo, đăng nhập CLI trong container, máy local làm computer cho việc nặng"
+title: Chuyển bot từ onhandbot sang MausBot trên Dokploy
+description: >-
+  Chạy fork OpenMausBot này trên Dokploy tại bot.onehand.space thay Rakazo, đăng
+  nhập CLI trong container, máy local làm computer cho việc nặng
 status: pending
 priority: P1
-branch: "main"
-tags: [deploy, dokploy, migration]
+branch: main
+tags:
+  - deploy
+  - dokploy
+  - migration
 blockedBy: []
 blocks: []
-created: "2026-11-12T07:42:04.259Z"
-createdBy: "ck:plan"
+created: '2026-11-12T07:42:04.259Z'
+createdBy: 'ck:plan'
 source: skill
 ---
 
@@ -84,10 +89,10 @@ Plan này viết cho một agent khác thực thi (Sonnet 5.5, mức high). Mọ
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Sao lưu cấu hình Rakazo: bỏ, anh xác nhận Rakazo chỉ là bản thử | Cancelled |
-| 2 | [File compose Dokploy](./phase-02-file-compose-dokploy.md) | Pending |
-| 3 | [Dựng MausBot song song](./phase-03-dung-mausbot-song-song.md) | Pending |
+| 2 | [File compose Dokploy](./phase-02-file-compose-dokploy.md) | Completed |
+| 3 | [Dựng MausBot song song](./phase-03-dung-mausbot-song-song.md) | Completed |
 | 4 | [Đăng nhập CLI trên VPS](./phase-04-dang-nhap-cli-tren-vps.md) | Pending |
-| 5 | [Chuyển domain và gỡ Rakazo](./phase-05-chuyen-doi-domain-va-tam-ngung-rakazo.md) | Pending |
+| 5 | [Chuyển domain và gỡ Rakazo](./phase-05-chuyen-doi-domain-va-tam-ngung-rakazo.md) | Completed |
 | 6 | [Nối máy local làm computer](./phase-06-noi-may-local-lam-computer.md) | Pending |
 
 Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bước không đảo ngược được là gỡ Rakazo ở phase 5 bước 9, và bước này đã được anh cho phép.
@@ -134,5 +139,72 @@ Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bư�
 
 Agent thực thi ghi vào đây sau mỗi phase: ngày giờ, phase, tool hoặc lệnh đã chạy, kết quả thật, commit nếu có.
 
-- `MAUS_ID`: (ghi ở phase 3)
-- `MAUS_APP`: (ghi ở phase 3)
+- `MAUS_ID`: `R9J9lfkVw9lAV-1venZ2M`
+- `MAUS_APP`: `compose-input-bluetooth-system-buiaek`
+
+### Phase 2 (12/11 15:10)
+- `docker compose config`: CONFIG_OK, và báo thiếu biến khi thiếu (MISSING_VAR_REFUSED).
+- Chạy thử Docker local, project `omb-dokploy-localtest`, cổng 127.0.0.1:18080, image `v0.1.153`:
+  - a: `/api/health` → `{"app":"openmausbot"}`
+  - b: `/api/connectors` → `403`
+  - c: `/` → `200`
+  - d: `maus`, HOME `/data`, codex-cli 0.167.2, Claude Code 2.1.322, grok 1.0.41. `openmausbot --version` in `0.0.0`.
+  - Thêm: giả `X-Forwarded-For: 127.0.0.1` → vẫn `403`.
+- Đã dọn: không còn container hay volume `omb-dokploy-localtest`.
+- Commit `a45df5685` đã lên `origin/main`, gồm đúng 2 file.
+
+### Phase 3 (12/11 15:12)
+- Mốc: 15 project, RAM đã dùng 15,86 GB / 24,6 GB, đĩa đã dùng 166,1 GB / 211,2 GB (đạt ngưỡng). Mốc lưu ở thư mục scratch, ngoài repo.
+- `compose-create` → `MAUS_ID`/`MAUS_APP` ở trên. Dokploy tạo mặc định `autoDeploy: true`; đã tắt ngay bằng `compose-update`, trước khi deploy.
+- `compose-update`: git https `phongchau120498-svg/OpenMausBot.git` nhánh main, composePath `./deploy/dokploy/docker-compose.yml`, `autoDeploy: false`. Clone https chạy được, không cần SSH key.
+- `compose-saveEnvironment`: DOMAIN, OMB_BASE_IMAGE `…:v0.1.153`, OMB_DATA_VOLUME `onhand-mausbot_data`.
+- `compose-deploy` → deployment `6XWQYlupIToZCMeOjHHBe`, `done` sau khoảng 2 phút, commit `a45df5685`. Không có lỗi thiếu biến `.env`.
+- Container: `…-omb-1` healthy, `…-caddy-1` running. Log omb: server nghe `/run/openmausbot/http.sock`, public URL `https://bot.onehand.space`, không có Error/EADDRINUSE.
+- Volume `onhand-mausbot_data` có thật.
+- Rakazo: web, api, worker, postgres, supervisor vẫn healthy.
+- Sau deploy: đĩa đã dùng 170,0 GB (còn khoảng 41 GB), RAM 16,2 GB.
+- Kiểm project: dùng `environment-byProjectId` cho `onhand-bot` (2 compose: `stack`, `mausbot`) thay cho `project-all` ở bước này, vì `project-all` rất dài. `project-all` đầy đủ sẽ chạy ở cuối phase 5.
+- Tên volume của Rakazo (cho phase 5, đã thấy trong danh sách volume): `compose-bypass-1080p-protocol-dv6zak_appdata`, `_pgdata`, `_postgres`, `_webassets`.
+
+### Phase 4 (12/11 15:30, đang làm)
+- Terminal container `d84c6fc898f6` (omb): `whoami` → `maus`, HOME `/data`, codex-cli 0.167.2, Claude Code 2.1.322, grok 1.0.41.
+- Codex tài khoản 1: anh chạy `codex login --device-auth` trong container → "Successfully logged in".
+- Đăng nhập nằm trên volume: `docker-listContainerFiles /data/.codex` có `auth.json` (chỉ xem tên file, không đọc nội dung). `/data` là volume `onhand-mausbot_data`, nên không cần thử restart.
+- Claude Code: anh đăng nhập bằng `/login` trong container. `docker-listContainerFiles /data/.claude` có `.credentials.json` (chỉ xem tên file). Lệnh thử `claude -p` chưa có kết quả gửi về.
+- Chưa làm: Grok, 4 tài khoản Codex còn lại.
+
+### Phase 5 (12/11 15:35, đang làm)
+- Bước 1: `compose-update` Rakazo `autoDeploy: false`. Kết quả trả về `autoDeploy: false`.
+- Bước 2: `compose-stop` Rakazo. Mọi container `compose-bypass-1080p-protocol-dv6zak-*` đều `exited`.
+- Bước 3: `domain-delete` 4 domain. Mỗi kết quả trả về đều xác nhận `composeId rkPYxiV0FMWyfpAGkV4zu`: `/`, `/api`, `/rpc`, `/health`.
+- Bước 4: `domain-create` → `ZDSEFSUoMj_fybTqulVzH`: `bot.onehand.space` `/` → `caddy:80`, https letsencrypt, không có middleware.
+- Bước 5: `compose-deploy` → `CDVWBkXZm8G64lcDtsJqR`, `done` sau 19 giây. Chỉ caddy được tạo lại; omb `d84c6fc898f6` giữ nguyên (đăng nhập còn).
+- Bước 6, chạy từ máy local:
+  - a: `/api/health` → `{"app":"openmausbot"}`
+  - b: `/api/connectors` → `403`
+  - c: `/` → `200`, ssl_verify `0`, chứng chỉ Let's Encrypt YR1, hết hạn 7/2/2027
+  - d: giả `X-Forwarded-For: 127.0.0.1` → `403`
+  - Traefik tự gắn `dokploy-network`, không cần sửa compose.
+- Bước 7: anh tự ghép trình duyệt trong khung trình duyệt của app bằng `openmausbot pair` (agent không nhập mã).
+- Bước 8, thay đổi so với plan: không tạo agent mới, mà nạp 5 bot từ file Grok export của anh qua **Settings → Import → Move from Grok Bot**.
+  - Gộp 5 file thành `~/Downloads/grok-bot-export-all-5-bots.json`; `parseGrokExport` của repo đọc ra đủ 5 bot.
+  - Xem trước rồi nạp: "Chiêu Giao · ASSIATANT is here" (24 skill, 4 routine), Gia Huy - ECOM (14/8), Minh Đăng (14/1), Tiêu Băng (14/8), UX UI PROMAX (14/0).
+  - Routine nạp ở trạng thái tạm dừng; 55 app cần kết nối lại.
+  - `PATCH /api/bots/<id>` `modelSelection {codex, gpt-6.1-sol, medium}` cho 5 bot: đều 200, đọc lại đúng giá trị.
+  - Bot MausBot (Chief of Staff mặc định) giữ `claude/claude-sonnet-5`.
+  - Thử Chiêu Giao: mức medium trả "ok" (3:47), mức high trả "ok" (3:48), sau đó trả về medium. Codex báo 23% hạn mức.
+- Lấy lại bot Như Phương - SALE từ Rakazo (anh yêu cầu trước khi gỡ):
+  - Chỉ bật container postgres `94931254607e` của Rakazo, không bật worker nên không routine nào chạy.
+  - Tạo lịch chạy một lần, đang tắt, `nk_VhsTzUQneZ67qGUhPk` (compose Rakazo, service postgres), chạy một `select` chỉ đọc bằng `runManually`. Kết quả: 3.144 ký tự hướng dẫn, 1 trí nhớ, 3 skill (upwork-job-filter, wiki-upwork, upwork-real-tips), 2 routine đang tắt.
+  - Đã dọn: `schedule-delete` lịch đó, `docker-stopContainer` postgres.
+  - Chuyển sang định dạng Grok, lưu ở `~/Downloads/grok-bot-export-nhu-phuong---sale.json`; `parseGrokExport` đọc được 1 bot, 3 skill, 2 routine, 1 trí nhớ.
+- Nạp Như Phương: anh chọn file trong hộp thoại Move from Grok Bot → bot `2fc48620…` có 3.144 ký tự hướng dẫn. `PATCH modelSelection` sang codex/gpt-6.1-sol/medium → 200. Thử lúc 15:54 → "ok".
+- Bước 9, gỡ Rakazo:
+  - `compose-delete rkPYxiV0FMWyfpAGkV4zu deleteVolumes:true`.
+  - `docker-removeContainer 9a5de85edc01` (`rakazo-bot-team-6de85fb4…`, khớp mẫu tên).
+  - Volume `_pgdata`, `_postgres`, `_webassets` đã mất cùng compose (getVolumeConfig trả 500). Còn `_appdata` có nhãn project `compose-bypass-1080p-protocol-dv6zak` → `dockerVolume-removeVolume`.
+  - `onhand-mausbot_data` vẫn còn nguyên.
+- Bước 10, backup: `destination-all` vẫn rỗng, nên chưa bật được. Chờ anh tạo destination S3 hoặc R2.
+- Bước 11: `project-all` so với mốc. 15 project; `onhand-bot` chỉ còn `mausbot R9J9lfkVw9lAV-1venZ2M`. 14 project còn lại cùng compose id và trạng thái như mốc (`shuttle-tunnel frps` vẫn `error` như trước).
+- Sau khi gỡ: `/api/health` → `{"app":"openmausbot"}`, `/api/connectors` → `403`.
+

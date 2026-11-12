@@ -1,9 +1,10 @@
 ---
 phase: 3
-title: "Dựng MausBot song song"
-status: pending
+title: Dựng MausBot song song
+status: completed
 priority: P1
-dependencies: [2]
+dependencies:
+  - 2
 ---
 
 # Phase 3: Dựng MausBot song song

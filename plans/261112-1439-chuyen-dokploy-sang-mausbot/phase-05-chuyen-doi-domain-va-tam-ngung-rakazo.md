@@ -1,9 +1,10 @@
 ---
 phase: 5
-title: "Chuyển domain và gỡ Rakazo"
-status: pending
+title: Chuyển domain và gỡ Rakazo
+status: completed
 priority: P1
-dependencies: [4]
+dependencies:
+  - 4
 ---
 
 # Phase 5: Chuyển domain và gỡ Rakazo

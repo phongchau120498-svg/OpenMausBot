@@ -1,7 +1,7 @@
 ---
 phase: 2
-title: "File compose Dokploy"
-status: pending
+title: File compose Dokploy
+status: completed
 priority: P1
 dependencies: []
 ---
