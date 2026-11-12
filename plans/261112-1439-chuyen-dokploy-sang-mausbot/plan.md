@@ -18,7 +18,7 @@ source: skill
 
 Thay Rakazo (onhandbot) bằng MausBot (fork này) trên cùng Dokploy, cùng domain `bot.onehand.space`. Agent chính chạy Codex GPT 6.1 Sol: mức medium cho việc nhẹ, high cho việc nặng. Việc nặng làm trên máy local qua "Share this computer". Lý do chọn MausBot: xem [báo cáo so sánh](../reports/bot-benchmark-261111-1738-plus-vs-onhandbot-report.md).
 
-Anh đã cho phép tạm ngưng Rakazo mà không cần hỏi lại. Tạm ngưng nghĩa là dừng container và tắt domain. **Không xóa** dữ liệu, volume hay project Rakazo.
+Rakazo chỉ là bản thử, chưa chạy thật. Anh đã cho phép gỡ hẳn mà không cần sao lưu và không cần hỏi lại. Chỉ gỡ sau khi MausBot đã chạy qua domain (phase 5).
 
 ## Đã kiểm tra production (12/11, chỉ đọc)
 
@@ -46,14 +46,14 @@ Anh đã cho phép tạm ngưng Rakazo mà không cần hỏi lại. Tạm ngưn
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 1 | [Sao lưu cấu hình Rakazo](./phase-01-sao-luu-cau-hinh-rakazo.md) | Pending |
+| 1 | Sao lưu cấu hình Rakazo: bỏ, anh xác nhận Rakazo chỉ là bản thử | Cancelled |
 | 2 | [File compose Dokploy](./phase-02-file-compose-dokploy.md) | Pending |
 | 3 | [Dựng MausBot song song](./phase-03-dung-mausbot-song-song.md) | Pending |
 | 4 | [Đăng nhập CLI trên VPS](./phase-04-dang-nhap-cli-tren-vps.md) | Pending |
-| 5 | [Chuyển domain và tạm ngưng Rakazo](./phase-05-chuyen-doi-domain-va-tam-ngung-rakazo.md) | Pending |
+| 5 | [Chuyển domain và gỡ Rakazo](./phase-05-chuyen-doi-domain-va-tam-ngung-rakazo.md) | Pending |
 | 6 | [Nối máy local làm computer](./phase-06-noi-may-local-lam-computer.md) | Pending |
 
-Chạy tuần tự. Phase 1 và 2 không đụng production, làm được ngay. Bước khó đảo ngược duy nhất nằm ở phase 5, và phase 5 có cách quay lại.
+Chạy tuần tự. Phase 2 không đụng production, làm được ngay. Bước không đảo ngược được là gỡ Rakazo ở phase 5 bước 9, và bước này đã được anh cho phép.
 
 ## Tiêu chí nghiệm thu
 
@@ -61,14 +61,14 @@ Chạy tuần tự. Phase 1 và 2 không đụng production, làm được ngay.
 - [ ] Anh ghép được trình duyệt và app desktop. Trang chưa đăng nhập chỉ hiện trang pair.
 - [ ] Agent chính chạy `codex` / `gpt-6.1-sol` / `medium`, trả lời một lượt thử. Chạy được thêm một lượt ở mức `high`.
 - [ ] Đăng nhập CLI nằm trong volume `/data`: restart hay redeploy container không mất đăng nhập.
-- [ ] Container Rakazo đã dừng, 4 domain đã tắt, `autoDeploy` đã tắt. Volume và project còn nguyên.
+- [ ] Rakazo đã gỡ hết: compose, volume, các container `rakazo-bot-team-*` và 4 domain. Project `onhand-bot` vẫn còn và chứa `mausbot`.
 - [ ] Không project Dokploy nào khác bị đổi: so `project.all` trước và sau.
 - [ ] Máy local hiện "Connected" trong Settings → Servers. Bot chạy được một lệnh trên máy local sau khi anh bấm Allow.
-- [ ] Có bản xuất cấu hình 5 bot Rakazo nằm ngoài git.
 
 ## Cách quay lại (rollback)
 
-Tắt domain của MausBot, rồi bật lại 4 domain Rakazo, chạy `compose.start` Rakazo và bật lại `autoDeploy`. Volume Rakazo không bị đụng nên dữ liệu còn nguyên. Chi tiết ở phase 5.
+- Trước khi gỡ Rakazo (phase 5 bước 9): xóa domain MausBot, tạo lại 4 domain Rakazo theo bảng ở trên, rồi `compose.start` Rakazo.
+- Sau khi gỡ: không quay về Rakazo được nữa, như anh đã cho phép. Nếu MausBot lỗi thì sửa MausBot.
 
 ## Đã phản biện (red team 12/11)
 
@@ -88,6 +88,5 @@ Tắt domain của MausBot, rồi bật lại 4 domain Rakazo, chạy `compose.s
 
 ## Câu hỏi còn mở
 
-1. Có làm subdomain thử `maus.onehand.space` (anh thêm bản ghi A → 51.79.254.165) để thử MausBot qua web trước khi chuyển hẳn không? Mặc định là **không**: chuyển thẳng domain vì anh đã cho tạm ngưng Rakazo. Trước đó MausBot chỉ được kiểm tra bên trong container.
+1. Có làm subdomain thử `maus.onehand.space` (anh thêm bản ghi A → 51.79.254.165) để thử MausBot qua web trước khi chuyển hẳn không? Mặc định là **không**: chuyển thẳng domain vì Rakazo chỉ là bản thử. Trước đó MausBot chỉ được kiểm tra bên trong container.
 2. Máy local có chuyển sang phiên Xorg không? Chỉ khi đó bot mới dùng được trình duyệt local. Ở lại Wayland thì bot chỉ dùng được thư mục và terminal.
-3. Có cần chép 5 bot Rakazo sang MausBot ngay không? Mặc định chỉ tạo agent chính. Hướng dẫn của 5 bot được giữ trong bản xuất để anh chép sau.

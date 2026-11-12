@@ -3,7 +3,7 @@ phase: 2
 title: "File compose Dokploy"
 status: pending
 priority: P1
-dependencies: [1]
+dependencies: []
 ---
 
 # Phase 2: File compose Dokploy

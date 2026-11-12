@@ -34,10 +34,7 @@ Tạo compose mới tên `mausbot` trong project `onhand-bot` trên Dokploy. Ch�
    - `docker.getContainersByAppNameMatch` cho thấy `omb` (healthy) và `caddy` đang chạy.
    - Log `omb` không có lỗi.
    - Xác nhận volume tên đúng `onhand-mausbot_data`.
-7. Kiểm tra trước API dùng ở phase 5:
-   - Tìm `domain.toggleEnable` trong OpenAPI của Dokploy (`settings.getOpenApiDocument`, chỉ đọc).
-   - Nếu không có: ghi lại đủ cấu hình 4 domain Rakazo (host, path, service, port, middleware). Phase 5 sẽ xóa rồi tạo lại khi cần rollback.
-8. Đọc cấu hình Traefik (`settings.readTraefikConfig`, chỉ đọc) để xem `forwardedHeaders` của entrypoint `websecure`. Phải là chế độ không tin client (mặc định), nghĩa là Traefik bỏ `X-Forwarded-For` mà client tự gửi lên.
+7. Đọc cấu hình Traefik (`settings.readTraefikConfig`, chỉ đọc) để xem `forwardedHeaders` của entrypoint `websecure`. Phải là chế độ không tin client (mặc định), nghĩa là Traefik bỏ `X-Forwarded-For` mà client tự gửi lên.
 
 ## Success Criteria
 - [ ] `omb` healthy, `caddy` đang chạy, Rakazo vẫn healthy và trang `bot.onehand.space` vẫn mở được.
