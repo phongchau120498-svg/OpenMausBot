@@ -14,9 +14,9 @@ Cập nhật: 13/11/2026 — Codex kiểm transcript và Git để chuyển máy
 - Dở chưa commit: checkpoint HANDOFF + script thử được commit/push trong lượt bàn giao này; không có patch app dở đượcGit ghi nhận. Trước sửa luôn đọc HEAD/status mới vì Claude có thể tiếp tục. Không đụng `.claude/launch.json` của main.
 - Kiểm tra lượt này: `bash -n` cho bảnscript lưu và `git diff --check`; không chạy app fixture, model, bot, tảiDrive, gửi hay đăng. Khi sửa app phải đọc [AGENTS.md](AGENTS.md) và [Verification](docs/verification/README.md), dùng fixture cô lập.
 
-## Lịch cập nhật repo gốc · nhánh `claude/schedule-upstream-updates-884c71`
+## Lịch cập nhật repo gốc · cùng nhánh công việc TikTok
 
-- Bàn giao đầy đủ nằm ở HANDOFF của nhánh này. Chưa có lịch được tạo. Anh chưa chọn phạm vi công việc, chu kỳ và giờ; đừng tự lên lịch hoặc tự merge upstream.
+- Bàn giao đầy đủ được giữ nguyên tại [bàn giao lịch upstream](plans/261113-upstream-updates/HANDOFF.md). Nhánh schedule ghi trong bản lưu là nhánh cũ; khi tiếp dùng nhánh TikTok hiện tại. Chưa có lịch được tạo. Anh chưa chọn phạm vi công việc, chu kỳ và giờ; đừng tự lên lịch hoặc tự merge upstream.
 - Hai hướng Claude mới đề xuất: báo cáo upstream hoặc nhánh cập nhật+PR; đây chưa phải lựa chọn đãduyệt.
 
 ## Sáu bot đang vận hành
@@ -28,3 +28,7 @@ Cập nhật: 13/11/2026 — Codex kiểm transcript và Git để chuyển máy
 Anh giao commit/push để tối đổi máy, **không deploy**. Chỉ push nhánh riêng, không main/tag/release/workflowdispatch, không đổi cấu hình production. Repo public: không commit secret, PII, phiênđăng nhập, soul/prompt/luật nghiệp vụ riêng hoặc ảnh nguồn.
 
 Biên nhận lưu chuyển máy: commit và push riêng nhánh này theo lệnh anh; không deploy, không push main.
+
+## Gom nhánh để chuyển máy · 13/11
+
+Theo lệnh anh, gộp lịch sử nhánh schedule vào nhánh TikTok và giữ nguyên toàn bộ bàn giao lịch upstream tại file kế hoạch ở trên. Sau khi push và xác minh remote giữ đủ lịch sử, dọn worktree/nhánh schedule; chỉ giữ `main` và `claude/tiktok-image-channel-bc6ab9`. Không deploy, không push main; chưa chạy app hoặc kiểm chất lượng ảnh/video.
